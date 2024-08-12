@@ -6,6 +6,8 @@ public class Hero : MonoBehaviour
 {
     [SerializeField] private float speed = 3f;
     [SerializeField] private float jumpForce = 6f;
+    [SerializeField] private float respawnYThreshold = -10f;  // Y position threshold for respawning
+    [SerializeField] private Vector3 respawnPosition;  // Position to respawn the character
 
     private Rigidbody2D rb;
     private SpriteRenderer sprite;
@@ -16,6 +18,8 @@ public class Hero : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         sprite = GetComponentInChildren<SpriteRenderer>();
+         // Optionally, set the respawn position to the initial position of the character
+        respawnPosition = transform.position;
     }
 
     private void FixedUpdate()
@@ -27,8 +31,12 @@ public class Hero : MonoBehaviour
     {
         if (Input.GetButton("Horizontal"))
             Run();
-        if (isGrounded && Input.GetButton("Vertical"))
+        if (isGrounded && Input.GetButton("Jump"))
             Jump();
+
+              // Check if the character has fallen below the respawn threshold
+        if (transform.position.y < respawnYThreshold)
+            Respawn();
     }
 
     private void Run()
@@ -53,5 +61,20 @@ public class Hero : MonoBehaviour
     {
         Debug.Log("Collided with: " + col.name);
     }
+    }
+     // Respawn the character to the designated respawn position
+    private void Respawn()
+    {
+    // Reset the position to the respawn position
+    transform.position = respawnPosition;
+
+    // Reset the rotation to zero (or any desired rotation)
+    transform.rotation = Quaternion.identity;
+
+    // Reset the Rigidbody's velocity to prevent carrying over any momentum
+    rb.velocity = Vector2.zero;
+
+    // Reset the Rigidbody's angular velocity to prevent any unwanted spinning
+    rb.angularVelocity = 0f;
     }
 }
