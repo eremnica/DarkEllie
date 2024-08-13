@@ -5,7 +5,7 @@ using UnityEngine;
 public class Hero : MonoBehaviour
 {
     [SerializeField] private float speed = 3f;
-    [SerializeField] private float jumpForce = 6f;
+    [SerializeField] private float jumpForce = 10f;
     [SerializeField] private float respawnYThreshold = -10f;  // Y position threshold for respawning
     [SerializeField] private Vector3 respawnPosition;  // Position to respawn the character
 
@@ -31,9 +31,8 @@ public class Hero : MonoBehaviour
     {
         if (Input.GetButton("Horizontal"))
             Run();
-        if (isGrounded && Input.GetButton("Jump"))
+         if (isGrounded && Input.GetKeyDown(KeyCode.Space)) // Use GetKeyDown for a fixed jump
             Jump();
-
               // Check if the character has fallen below the respawn threshold
         if (transform.position.y < respawnYThreshold)
             Respawn();
@@ -49,7 +48,7 @@ public class Hero : MonoBehaviour
 
     private void Jump()
     {
-        rb.AddForce(transform.up * jumpForce, ForceMode2D.Impulse);
+        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
     }
 
     private void CheckGround()

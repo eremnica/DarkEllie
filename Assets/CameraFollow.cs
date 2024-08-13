@@ -8,6 +8,7 @@ public class CameraFollow : MonoBehaviour
     public Transform target;  // Reference to the player's transform
     public float offsetX = 0f; // Horizontal offset
 
+
     private float fixedY;      // Fixed Y position for the camera
 
     private void Start()
@@ -18,7 +19,7 @@ public class CameraFollow : MonoBehaviour
         // Optionally, you can also initialize offsetX based on the initial position
         offsetX = transform.position.x - target.position.x;
     }
-
+    
     private void LateUpdate()
     {
         // Follow the character's X movement, keeping the Y position fixed
