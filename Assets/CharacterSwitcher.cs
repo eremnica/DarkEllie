@@ -58,4 +58,10 @@ public class CharacterSwitcher : MonoBehaviour
         // Update the camera to follow the newly activated character
         cameraFollow.target = characters[index].transform;
     }
+
+    // New method to get the currently active character
+    public GameObject GetActiveCharacter()
+    {
+        return characters[currentCharacterIndex];
+    }
 }
