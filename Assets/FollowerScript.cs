@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro; // For TextMeshPro elements
+using TMPro;
 
 public class Follower : MonoBehaviour
 {
@@ -25,10 +25,13 @@ public class Follower : MonoBehaviour
         if (proximityMessage != null)
         {
             proximityMessage.gameObject.SetActive(false);
-            // Ensure the text is using auto-size for dynamic scaling
             proximityMessage.enableAutoSizing = true;
             proximityMessage.fontSizeMin = 10; // Adjust min size as needed
             proximityMessage.fontSizeMax = 50; // Adjust max size as needed
+        }
+        else
+        {
+            Debug.LogError("Proximity Message is not assigned in the inspector!");
         }
     }
 
@@ -37,7 +40,7 @@ public class Follower : MonoBehaviour
         if (characterSwitcher != null)
         {
             // Get the active character from the CharacterSwitcher script
-            activeCharacter = characterSwitcher.GetActiveCharacter().transform;
+            activeCharacter = characterSwitcher.GetActiveCharacter()?.transform;
 
             if (activeCharacter != null)
             {
@@ -46,13 +49,15 @@ public class Follower : MonoBehaviour
                 // Show/hide the proximity message based on distance
                 if (distanceToTarget <= followDistance)
                 {
-                    if (proximityMessage != null)
+                    if (proximityMessage != null && !isFollowing)
                     {
                         proximityMessage.gameObject.SetActive(true); // Show the message
+                        UpdateProximityMessagePosition(); // Update the position of the message
                     }
 
                     if (Input.GetKeyDown(KeyCode.E))
                     {
+                        proximityMessage.gameObject.SetActive(false);
                         isFollowing = !isFollowing; // Toggle the following state
                         isStopped = false;          // Reset the stopped state when toggling
                     }
@@ -94,4 +99,20 @@ public class Follower : MonoBehaviour
             isFollowing = true;
         }
     }
+
+  private void UpdateProximityMessagePosition()
+{
+    if (proximityMessage != null)
+    {
+        // Convert the follower's world position to a screen position
+        Vector3 screenPosition = Camera.main.WorldToScreenPoint(transform.position);
+
+        // Offset the text to appear above the character's head
+        screenPosition.y += 430; // Adjust this value as needed to place above the head
+        screenPosition.x += 30;
+        // Apply the updated position to the TextMeshPro element
+        proximityMessage.transform.position = screenPosition;
+    }
+}
+
 }
