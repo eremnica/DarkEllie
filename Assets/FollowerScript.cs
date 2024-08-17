@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
@@ -19,7 +17,7 @@ public class Follower : MonoBehaviour
     private void Start()
     {
         // Find the CharacterSwitcher script in the scene
-        characterSwitcher = FindObjectOfType<CharacterSwitcher>();
+        characterSwitcher = FindFirstObjectByType<CharacterSwitcher>();
 
         // Ensure the proximity message is hidden at the start
         if (proximityMessage != null)
@@ -100,19 +98,19 @@ public class Follower : MonoBehaviour
         }
     }
 
-  private void UpdateProximityMessagePosition()
-{
-    if (proximityMessage != null)
+    private void UpdateProximityMessagePosition()
     {
-        // Convert the follower's world position to a screen position
-        Vector3 screenPosition = Camera.main.WorldToScreenPoint(transform.position);
+        if (proximityMessage != null)
+        {
+            // Convert the follower's world position to a screen position
+            Vector3 screenPosition = Camera.main.WorldToScreenPoint(transform.position);
 
-        // Offset the text to appear above the character's head
-        screenPosition.y += 430; // Adjust this value as needed to place above the head
-        screenPosition.x += 30;
-        // Apply the updated position to the TextMeshPro element
-        proximityMessage.transform.position = screenPosition;
+            // Offset the text to appear above the character's head
+            screenPosition.y += 150; // Adjust this value as needed to place above the head
+            screenPosition.x += 8;
+            // Apply the updated position to the TextMeshPro element
+            proximityMessage.transform.position = screenPosition;
+        }
     }
-}
 
 }

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
@@ -19,7 +17,7 @@ public class CameraFollow : MonoBehaviour
         // Optionally, you can also initialize offsetX based on the initial position
         offsetX = transform.position.x - target.position.x;
     }
-    
+
     private void LateUpdate()
     {
         // Follow the character's X movement, keeping the Y position fixed
