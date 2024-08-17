@@ -17,7 +17,7 @@ public class Hero : MonoBehaviour
     public Vector2 boxSize;
     public float castDistance;
     public LayerMask groundLayer;
-
+    //этот код был обновлен и нуждается в дальнейшей инспекции
     /// <summary>
     /// Initializes the hero's components and sets the respawn position.
     /// </summary>
