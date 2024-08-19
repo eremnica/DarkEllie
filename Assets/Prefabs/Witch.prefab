@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3016076213130268895}
   - component: {fileID: 5164866291180380801}
   - component: {fileID: 400852117686042853}
-  - component: {fileID: 4242811467206466267}
+  - component: {fileID: 950124720559024517}
   m_Layer: 0
   m_Name: Witch
   m_TagString: Enemy
@@ -163,7 +163,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2.06, y: 3.03}
   m_EdgeRadius: 0
---- !u!114 &4242811467206466267
+--- !u!114 &950124720559024517
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -172,9 +172,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1179582423896866597}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 655d5791911cd4d6784810ecdf02c8c2, type: 3}
+  m_Script: {fileID: 11500000, guid: 13dee1975318e459382f906f4af5258c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyPrefab: {fileID: 0}
-  spawnPoint: {fileID: 0}
-  respawnDelay: 30
+  speed: 2
+  stoppingDistance: 1
+  health: 3
+  attackRange: 1
+  attackCooldown: 2
+  damage: 1
