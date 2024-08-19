@@ -59,7 +59,10 @@ public class Hero : MonoBehaviour
     {
         float horizontalInput = Input.GetAxis("Horizontal");
         rb.linearVelocity = new Vector2(horizontalInput * speed, rb.linearVelocity.y);
-        sprite.flipX = horizontalInput < 0;
+        if (horizontalInput != 0)
+        {
+            sprite.flipX = horizontalInput < 0;
+        }
     }
 
     /// <summary>
