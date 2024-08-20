@@ -1,28 +1,19 @@
 using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
-
 {
-    public Transform target;  // Reference to the player's transform
-    public float offsetX = 0f; // Horizontal offset
-
-
-    private float fixedY;      // Fixed Y position for the camera
+    public Transform target;  // Ссылка на трансформ игрока
+    private float initialY;    // Начальная высота камеры относительно игрока
 
     private void Start()
     {
-        // Initialize the fixed Y position with the camera's initial Y position
-        fixedY = transform.position.y;
-
-        // Optionally, you can also initialize offsetX based on the initial position
-        offsetX = transform.position.x - target.position.x;
+        // Запоминаем начальную высоту камеры относительно игрока
+        initialY = transform.position.y - target.position.y;
     }
 
     private void LateUpdate()
     {
-        // Follow the character's X movement, keeping the Y position fixed
-        transform.position = new Vector3(target.position.x + offsetX, fixedY, transform.position.z);
+        // Камера следует за игроком по X и сохраняет начальную высоту по Y
+        transform.position = new Vector3(target.position.x, target.position.y + initialY, transform.position.z);
     }
-
 }
-
