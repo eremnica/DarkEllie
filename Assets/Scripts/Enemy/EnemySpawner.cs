@@ -1,40 +1,31 @@
 using UnityEngine;
 
-
-public class EnemySpawner: MonoBehaviour
+public class EnemySpawner : MonoBehaviour
 {
-    public static EnemySpawner Instance;
-    public GameObject enemyPrefab;
-    public Transform spawnPoint;
-    public float respawnDelay = 30f;
+    public GameObject enemyPrefab;   // Префаб врага
+    public Transform spawnPoint1;    // Первая точка спавна
+    public Transform spawnPoint2;    // Вторая точка спавна
+    public Transform spawnPoint3;    // Третья точка спавна
 
-    private GameObject currentEnemy;
-
-    void Awake()
+    private void Start()
     {
-        Instance = this;
+        // Спавним врагов в каждой из точек спавна
+        SpawnEnemies();
     }
 
-    void Start()
+    void SpawnEnemies()
     {
-        SpawnEnemy();
+        // Спавним врага в каждой из трех точек спавна
+        SpawnEnemyAt(spawnPoint1);
+        SpawnEnemyAt(spawnPoint2);
+        SpawnEnemyAt(spawnPoint3);
     }
 
-    void SpawnEnemy()
+    void SpawnEnemyAt(Transform spawnPoint)
     {
-        if (currentEnemy == null)
+        if (spawnPoint != null)
         {
-            currentEnemy = Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation);
+            Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation);
         }
     }
-
-    public void EnemyDied()
-    {
-
-        currentEnemy = null;
-
-
-        Invoke("SpawnEnemy", respawnDelay);
-    }
 }
-

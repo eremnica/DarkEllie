@@ -8,8 +8,9 @@ public class Enemy : MonoBehaviour
     public float attackRange = 1f;
     public float attackCooldown = 2f;
     public int damage = 1;
+    public float detectionRange = 10f; // Расстояние обнаружения игрока
 
-    private Transform targetPlayer; // цель, за которой будет следовать враг
+    private Transform targetPlayer; // Цель, за которой будет следовать враг
     private float attackTimer;
     private bool isDead = false; // Проверка, жив ли враг
     private bool isAttracted = false; // Проверка, привлекается ли враг к Тотошке
@@ -30,16 +31,31 @@ public class Enemy : MonoBehaviour
         {
             // Иначе ищем ближайшего игрока
             FindClosestPlayer();
-            if (targetPlayer != null && Vector2.Distance(transform.position, targetPlayer.position) > stoppingDistance)
-            {
-                FollowTarget(targetPlayer);
-            }
-        }
 
-        // Проверка на возможность атаки
-        if (targetPlayer != null && Vector2.Distance(transform.position, targetPlayer.position) <= attackRange)
-        {
-            AttackPlayer();
+            if (targetPlayer != null)
+            {
+                float distanceToPlayer = Vector2.Distance(transform.position, targetPlayer.position);
+
+                if (distanceToPlayer <= detectionRange)
+                {
+                    // Если игрок в пределах расстояния обнаружения
+                    if (distanceToPlayer > stoppingDistance)
+                    {
+                        FollowTarget(targetPlayer);
+                    }
+
+                    // Проверка на возможность атаки
+                    if (distanceToPlayer <= attackRange)
+                    {
+                        AttackPlayer();
+                    }
+                }
+                else
+                {
+                    // Игрок вне зоны обнаружения - не двигаться
+                    StopMoving();
+                }
+            }
         }
     }
 
@@ -49,6 +65,12 @@ public class Enemy : MonoBehaviour
         {
             transform.position = Vector2.MoveTowards(transform.position, target.position, speed * Time.deltaTime);
         }
+    }
+
+    void StopMoving()
+    {
+        // Останавливаем движение врага
+        // На самом деле здесь ничего не делаем, так как движение уже останавливается в методе FollowTarget, когда цель не близка
     }
 
     void FindClosestPlayer()
@@ -97,7 +119,7 @@ public class Enemy : MonoBehaviour
     {
         isDead = true;
         gameObject.SetActive(false);
-        EnemySpawner.Instance.EnemyDied(); // Уведомляем спавнер, что враг мертв
+        //EnemySpawner.Instance.EnemyDied(); // Уведомляем спавнер, что враг мертв
     }
 
     public void AttractTo(Transform target)

@@ -35,7 +35,7 @@ public class CharacterAttack : MonoBehaviour
         health -= damage;
         if (health <= 0)
         {
-            // потом сделаю логику смерти игрока - перезапуск уровня и тд
+            // потом сделаю логику 
         }
     }
 
