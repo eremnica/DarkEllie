@@ -12,25 +12,42 @@ public class Enemy : MonoBehaviour
     private Transform targetPlayer; // цель, за которой будет следовать враг
     private float attackTimer;
     private bool isDead = false; // Проверка, жив ли враг
+    private bool isAttracted = false; // Проверка, привлекается ли враг к Тотошке
+
+    private Transform attractedTarget; // Цель, к которой привлекается враг
 
     void Update()
     {
         if (isDead)
-            return; // сли враг мертв, ничего не делаем
+            return; // Если враг мертв, ничего не делаем
 
-
-        FindClosestPlayer();
-
-        // если есть цель, двигаемся к ней
-        if (targetPlayer != null && Vector2.Distance(transform.position, targetPlayer.position) > stoppingDistance)
+        if (isAttracted && attractedTarget != null)
         {
-            transform.position = Vector2.MoveTowards(transform.position, targetPlayer.position, speed * Time.deltaTime);
+            // Если враг привлекается к цели, следуем за ней
+            FollowTarget(attractedTarget);
+        }
+        else
+        {
+            // Иначе ищем ближайшего игрока
+            FindClosestPlayer();
+            if (targetPlayer != null && Vector2.Distance(transform.position, targetPlayer.position) > stoppingDistance)
+            {
+                FollowTarget(targetPlayer);
+            }
         }
 
-        // Проверка 
+        // Проверка на возможность атаки
         if (targetPlayer != null && Vector2.Distance(transform.position, targetPlayer.position) <= attackRange)
         {
             AttackPlayer();
+        }
+    }
+
+    void FollowTarget(Transform target)
+    {
+        if (target != null)
+        {
+            transform.position = Vector2.MoveTowards(transform.position, target.position, speed * Time.deltaTime);
         }
     }
 
@@ -57,7 +74,7 @@ public class Enemy : MonoBehaviour
     {
         if (attackTimer <= 0f)
         {
-            // урон игроку
+            // Наносим урон игроку
             targetPlayer.GetComponent<CharacterAttack>().TakeDamage(damage);
             attackTimer = attackCooldown;
         }
@@ -80,6 +97,18 @@ public class Enemy : MonoBehaviour
     {
         isDead = true;
         gameObject.SetActive(false);
-        EnemySpawner.Instance.EnemyDied(); // уведомляем спавнер, что враг мертв
+        EnemySpawner.Instance.EnemyDied(); // Уведомляем спавнер, что враг мертв
+    }
+
+    public void AttractTo(Transform target)
+    {
+        attractedTarget = target;
+        isAttracted = true;
+    }
+
+    public void StopAttraction()
+    {
+        isAttracted = false;
+        attractedTarget = null;
     }
 }
