@@ -2,68 +2,57 @@ using UnityEngine;
 
 public class LeverTrap2D : MonoBehaviour
 {
-    public GameObject trapTile; // Блок, который должен исчезать и появляться
+    public GameObject trapTile;  // Ссылка на тайл-ловушку
     public float detectionRange = 2f; // Радиус активации рычага
-    public KeyCode activationKey = KeyCode.E; // Клавиша для активации рычага
-
-    private Transform playerTransform;
-
-    private void Start()
-    {
-        // Находим игрока в начале игры
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
-        {
-            playerTransform = player.transform;
-            Debug.Log("Игрок найден: " + player.name);
-        }
-        else
-        {
-            Debug.LogError("Игрок с тегом 'Player' не найден в сцене.");
-        }
-
-        // Проверяем, установлен ли блок ловушки
-        if (trapTile != null)
-        {
-            Debug.Log("trapTile установлен: " + trapTile.name);
-        }
-        else
-        {
-            Debug.LogError("trapTile не установлен в инспекторе.");
-        }
-    }
+    private GameObject closestPlayer; // Ссылка на ближайшего игрока
 
     private void Update()
     {
-        if (playerTransform == null)
-            return;
+        // Находим ближайшего игрока
+        closestPlayer = FindClosestPlayer();
 
-        // Рассчитываем расстояние по осям X и Y
-        float distance = Vector2.Distance(new Vector2(transform.position.x, transform.position.y),
-                                          new Vector2(playerTransform.position.x, playerTransform.position.y));
-
-        Debug.Log("Расстояние до игрока по осям X и Y: " + distance);
-
-        // Проверяем, находится ли игрок в радиусе активации
-        if (distance <= detectionRange)
+        if (closestPlayer != null)
         {
-            Debug.Log("Игрок в радиусе активации.");
+            // Рассчитываем расстояние до ближайшего игрока
+            float distance = Vector2.Distance(transform.position, closestPlayer.transform.position);
 
-            if (Input.GetKeyDown(activationKey))
+            // Проверяем, находится ли ближайший игрок в радиусе активации и нажата ли кнопка E
+            if (distance <= detectionRange && Input.GetKeyDown(KeyCode.E))
             {
-                Debug.Log("Клавиша активации нажата.");
+                // Переключаем состояние ловушки
                 ToggleTrap();
             }
         }
     }
 
+    // Метод для поиска ближайшего игрока
+    private GameObject FindClosestPlayer()
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        GameObject closest = null;
+        float minDistance = Mathf.Infinity;
+
+        foreach (GameObject player in players)
+        {
+            float distance = Vector2.Distance(transform.position, player.transform.position);
+
+            if (distance < minDistance)
+            {
+                closest = player;
+                minDistance = distance;
+            }
+        }
+
+        return closest;
+    }
+
+    // Метод для переключения состояния ловушки
     private void ToggleTrap()
     {
         if (trapTile != null)
         {
-            // Переключаем состояние блока
+            // Если ловушка активна (отображается), то отключаем её, иначе включаем
             trapTile.SetActive(!trapTile.activeSelf);
-            Debug.Log("Состояние trapTile переключено. Активен: " + trapTile.activeSelf);
         }
     }
 }
