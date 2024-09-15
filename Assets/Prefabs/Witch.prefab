@@ -151,7 +151,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.03876114, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -161,7 +161,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 2.06, y: 3.03}
+  m_Size: {x: 2.5165205, y: 3.03}
   m_EdgeRadius: 0
 --- !u!114 &950124720559024517
 MonoBehaviour:
@@ -177,8 +177,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 2
   stoppingDistance: 1
-  health: 3
-  attackRange: 1
+  maxHealth: 3
+  attackRange: 2
   attackCooldown: 2
   damage: 1
   detectionRange: 5
+  knockbackForce: 4
+  healthBarPrefab: {fileID: 671397712791597859, guid: 12f36c5aa37404243838dc36aa0f53ab, type: 3}

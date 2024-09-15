@@ -1,14 +1,18 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour
 {
     public float speed = 2f;
-    public float stoppingDistance = 1f;
-    public int health = 3;
-    public float attackRange = 1f;
+    public float stoppingDistance = 0.3f;
+    public int maxHealth = 3; // Максимальное здоровье врага
+    private int currentHealth; // Текущее здоровье
+
+    public float attackRange = 30f; // Радиус атаки врага
     public float attackCooldown = 2f;
     public int damage = 1;
-    public float detectionRange = 10f; // Расстояние обнаружения игрока
+    public float detectionRange = 10f; // Радиус обнаружения игрока
+    public float knockbackForce = 5f;  // Сила отталкивания
 
     private Transform targetPlayer; // Цель, за которой будет следовать враг
     private float attackTimer;
@@ -16,47 +20,78 @@ public class Enemy : MonoBehaviour
     private bool isAttracted = false; // Проверка, привлекается ли враг к Тотошке
 
     private Transform attractedTarget; // Цель, к которой привлекается враг
+    private Rigidbody2D rb; // Ссылка на Rigidbody2D для физики
+
+    
+    public GameObject healthBarPrefab; // Префаб шкалы здоровья
+    private Image healthBarImage; // Изображение шкалы здоровья
+    private Transform healthBarUI; // Канвас со шкалой здоровья
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        currentHealth = maxHealth;
+
+        // Инициализация шкалы здоровья
+        GameObject healthBarInstance = Instantiate(healthBarPrefab, transform.position, Quaternion.identity);
+        healthBarUI = healthBarInstance.transform;
+
+        // Поиск Image по имени в healthBarUI
+        Transform healthBarImageTransform = healthBarUI.Find("Full"); 
+        if (healthBarImageTransform != null)
+        {
+            healthBarImage = healthBarImageTransform.GetComponent<Image>();
+        }
+        else
+        {
+            Debug.LogError("HealthBarImageName not found in healthBarUI");
+        }
+
+        // Привязываем шкалу здоровья к позиции врага
+        healthBarUI.SetParent(GameObject.Find("Canvas").transform, false); // Canvas должен быть в сцене
+    }
 
     void Update()
     {
         if (isDead)
-            return; // Если враг мертв, ничего не делаем
+            return;
 
         if (isAttracted && attractedTarget != null)
         {
-            // Если враг привлекается к цели, следуем за ней
             FollowTarget(attractedTarget);
         }
         else
         {
-            // Иначе ищем ближайшего игрока
             FindClosestPlayer();
 
             if (targetPlayer != null)
             {
                 float distanceToPlayer = Vector2.Distance(transform.position, targetPlayer.position);
+                //Debug.LogError(string.Format($"HERO ({distanceToPlayer}) ({targetPlayer}) ({attackRange})"));
+
 
                 if (distanceToPlayer <= detectionRange)
                 {
-                    // Если игрок в пределах расстояния обнаружения
                     if (distanceToPlayer > stoppingDistance)
                     {
                         FollowTarget(targetPlayer);
                     }
 
-                    // Проверка на возможность атаки
                     if (distanceToPlayer <= attackRange)
                     {
                         AttackPlayer();
                     }
                 }
-                else
-                {
-                    // Игрок вне зоны обнаружения - не двигаться
-                    StopMoving();
-                }
             }
         }
+
+        if (attackTimer > 0)
+        {
+            attackTimer -= Time.deltaTime;
+        }
+
+        // Обновляем позицию шкалы здоровья над врагом
+        UpdateHealthBarPosition();
     }
 
     void FollowTarget(Transform target)
@@ -65,12 +100,6 @@ public class Enemy : MonoBehaviour
         {
             transform.position = Vector2.MoveTowards(transform.position, target.position, speed * Time.deltaTime);
         }
-    }
-
-    void StopMoving()
-    {
-        // Останавливаем движение врага
-        // На самом деле здесь ничего не делаем, так как движение уже останавливается в методе FollowTarget, когда цель не близка
     }
 
     void FindClosestPlayer()
@@ -96,22 +125,50 @@ public class Enemy : MonoBehaviour
     {
         if (attackTimer <= 0f)
         {
-            // Наносим урон игроку
-            targetPlayer.GetComponent<CharacterAttack>().TakeDamage(damage);
-            attackTimer = attackCooldown;
-        }
-        else
-        {
-            attackTimer -= Time.deltaTime;
+            if (targetPlayer != null && targetPlayer.GetComponent<CharacterHealth>() != null)
+            {
+                // Рассчитываем направление отталкивания (от врага к игроку)
+                Vector2 knockbackDirection = (targetPlayer.position - transform.position).normalized;
+
+                // Наносим урон игроку и передаем направление отталкивания
+                targetPlayer.GetComponent<CharacterHealth>().TakeDamage(damage, knockbackDirection);
+                attackTimer = attackCooldown; // Запускаем таймер атаки
+            }
         }
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage, Vector2 attackDirection)
     {
-        health -= damage;
-        if (health <= 0)
+        currentHealth -= damage;
+
+        // Обновляем шкалу здоровья
+        UpdateHealthBar();
+
+        // Добавляем эффект отталкивания врага
+        rb.AddForce(attackDirection * knockbackForce, ForceMode2D.Impulse);
+        Debug.LogError(string.Format($"ENEMY ({attackDirection}) ({knockbackForce}) ({ForceMode2D.Impulse})"));
+
+        if (currentHealth <= 0)
         {
             Die();
+        }
+    }
+
+    void UpdateHealthBar()
+    {
+        if (healthBarImage != null)
+        {
+            healthBarImage.fillAmount = Mathf.Clamp01((float)currentHealth / maxHealth);
+        }
+    }
+
+    void UpdateHealthBarPosition()
+    {
+        if (healthBarUI != null)
+        {
+            Vector3 healthBarWorldPosition = transform.position + new Vector3(0.32f, 2.75f, 0); // Позиция над врагом
+            Vector3 screenPosition = Camera.main.WorldToScreenPoint(healthBarWorldPosition);
+            healthBarUI.position = screenPosition;
         }
     }
 
@@ -119,7 +176,10 @@ public class Enemy : MonoBehaviour
     {
         isDead = true;
         gameObject.SetActive(false);
-        //EnemySpawner.Instance.EnemyDied(); // Уведомляем спавнер, что враг мертв
+        if (healthBarUI != null)
+        {
+            Destroy(healthBarUI.gameObject); // Удаляем шкалу здоровья при смерти
+        }
     }
 
     public void AttractTo(Transform target)
@@ -132,5 +192,11 @@ public class Enemy : MonoBehaviour
     {
         isAttracted = false;
         attractedTarget = null;
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 }

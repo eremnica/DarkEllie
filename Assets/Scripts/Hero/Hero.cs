@@ -58,7 +58,9 @@ public class Hero : MonoBehaviour
     private void Run()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
-        rb.linearVelocity = new Vector2(horizontalInput * speed, rb.linearVelocity.y);
+       rb.linearVelocity = new Vector2(horizontalInput * speed, rb.linearVelocity.y);
+       //rb.AddForce(new Vector2(horizontalInput * speed, 0), ForceMode2D.Force);
+
         if (horizontalInput != 0)
         {
             sprite.flipX = horizontalInput < 0;
@@ -124,9 +126,9 @@ public class Hero : MonoBehaviour
             // Reset the rotation to zero (or any desired rotation).
             transform.rotation = Quaternion.identity;
             // Reset the Rigidbody's velocity to prevent carrying over any momentum.
-            rb.linearVelocity = Vector2.zero;
-            // Reset the Rigidbody's angular velocity to prevent any unwanted spinning.
-            rb.angularVelocity = 0f;
+            //rb.linearVelocity = Vector2.zero;
+            //// Reset the Rigidbody's angular velocity to prevent any unwanted spinning.
+            //rb.angularVelocity = 0f;
         }
     }
 }
