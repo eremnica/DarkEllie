@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - MovebleBlock
   - Square
+  - Boss
   layers:
   - Default
   - TransparentFX
