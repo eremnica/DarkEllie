@@ -1,9 +1,5 @@
-using JetBrains.Annotations;
 using UnityEngine;
 
-/// <summary>
-/// Represents a Hero character in the game with movement, jumping, and respawn functionality.
-/// </summary>
 public class Hero : MonoBehaviour
 {
     [SerializeField]
@@ -13,63 +9,57 @@ public class Hero : MonoBehaviour
     public Vector2 respawnPosition; // Position to respawn the hero after falling below the threshold.
     public Rigidbody2D rb; // Reference to the Rigidbody2D component.
     public SpriteRenderer sprite; // Reference to the SpriteRenderer component.
-    public float rayDistance = 12.2f;
-    public Vector2 boxSize;
-    public float castDistance;
-    public LayerMask groundLayer;
+    public float castDistance = 0.5f; // Distance for ground detection.
+    public Vector2 boxSize = new Vector2(0.5f, 0.2f); // Size of the box used for ground detection.
+    public LayerMask groundLayer; // Ground layer for ground detection.
 
-    /// <summary>
-    /// Initializes the hero's components and sets the respawn position.
-    /// </summary>
+    private Animator animator; // Reference to the Animator component.
 
     private void Awake()
     {
+        // Initialize the components
         rb = GetComponent<Rigidbody2D>();
         sprite = GetComponentInChildren<SpriteRenderer>();
         respawnPosition = transform.position;
+        animator = GetComponent<Animator>();
     }
 
-    /// <summary>
-    /// Called once per frame to handle movement, jumping, and respawning.
-    /// </summary>
     private void Update()
     {
-        //CheckGround();
         HandleMovement();
         HandleRespawn();
+
+        float move = Input.GetAxis("Horizontal");
+
+        // Обновление параметра в аниматоре для переключения между Idle и Walk
+        if (animator != null) // Проверка на наличие аниматора
+        {
+            animator.SetBool("isMoving", move != 0); // Если движение есть, включаем ходьбу
+        }
     }
 
-    /// <summary>
-    /// Handles horizontal movement of the hero based on player input.
-    /// </summary>
+
     private void HandleMovement()
     {
         Run();
         Jump();
     }
 
-    /// <summary>
-    /// Checks if the hero has fallen below the respawn threshold and respawns if necessary.
-    /// </summary>
-    ///
-    /// <summary>
-    /// Moves the hero horizontally based on player input.
-    /// </summary>
     private void Run()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
-       rb.linearVelocity = new Vector2(horizontalInput * speed, rb.linearVelocity.y);
-       //rb.AddForce(new Vector2(horizontalInput * speed, 0), ForceMode2D.Force);
 
+        // Move the character
+        rb.linearVelocity = new Vector2(horizontalInput * speed, rb.linearVelocity.y);
+
+
+        // Flip the sprite based on the direction of movement
         if (horizontalInput != 0)
         {
             sprite.flipX = horizontalInput < 0;
         }
     }
 
-    /// <summary>
-    /// Applies an upward force to the hero to make it jump.
-    /// </summary>
     private void Jump()
     {
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded())
@@ -78,57 +68,25 @@ public class Hero : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Checks if the hero is grounded by detecting collisions with the ground.
-    /// </summary>
-    //private void CheckGround()
-    //{
-    //  RaycastHit2D hit = Physics2D.Raycast(rb.position, Vector2.down, rayDistance, LayerMask.GetMask("Ground"));
-
-    //if (hit.collider != null)
-    //{
-    //  isGrounded = true;
-    //Debug.Log("Grounded");
-    //}
-    //else
-    //{
-    //  isGrounded = false;
-    //}
-
-    //isGrounded = Physics2D.OverlapCircle(transform.position, 0.1f, LayerMask.GetMask("Ground")) != null;
-
-    // }
     private bool isGrounded()
     {
-        if (Physics2D.BoxCast(transform.position, boxSize, 0, -transform.up, castDistance, groundLayer))
-        {
-            return true;
-
-        }
-        else
-        {
-            return false;
-
-        }
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawWireCube(transform.position - transform.up * castDistance, boxSize);
+        // Cast a box to check if the hero is on the ground
+        return Physics2D.BoxCast(transform.position, boxSize, 0, Vector2.down, castDistance, groundLayer);
     }
 
     private void HandleRespawn()
     {
         if (transform.position.y < respawnYThreshold)
         {
-            // Reset the position to the respawn position.
+            // Reset the position to the respawn position
             transform.position = respawnPosition;
-            // Reset the rotation to zero (or any desired rotation).
             transform.rotation = Quaternion.identity;
-            // Reset the Rigidbody's velocity to prevent carrying over any momentum.
-            //rb.linearVelocity = Vector2.zero;
-            //// Reset the Rigidbody's angular velocity to prevent any unwanted spinning.
-            //rb.angularVelocity = 0f;
+            rb.linearVelocity = Vector2.zero; // Reset the velocity
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireCube(transform.position - transform.up * castDistance, boxSize);
     }
 }
