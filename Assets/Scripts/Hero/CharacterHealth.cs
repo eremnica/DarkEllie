@@ -57,11 +57,10 @@ public class CharacterHealth : MonoBehaviour
     // Метод для получения урона
     public void TakeDamage(int damage, Vector2 knockbackDirection)
     {
-        Debug.LogError(string.Format($"Take Attack"));
         if (currentHealth > 0)
         {
             currentHealth -= damage;
-            Debug.LogError(string.Format($"Take Attack 1"));
+
             // Обновляем шкалу здоровья
             UpdateHealthBar();
 

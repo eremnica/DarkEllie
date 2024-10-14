@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 5164866291180380801}
   - component: {fileID: 400852117686042853}
   - component: {fileID: 950124720559024517}
-  - component: {fileID: 5113617154169684360}
   m_Layer: 0
   m_Name: Witch
   m_TagString: Enemy
@@ -177,26 +176,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 2
-  stoppingDistance: 0.1
+  stoppingDistance: 1
   maxHealth: 3
-  attackRange: 3
+  attackRange: 2
   attackCooldown: 2
   damage: 1
   detectionRange: 5
   knockbackForce: 4
-  isDead: 0
   healthBarPrefab: {fileID: 671397712791597859, guid: 12f36c5aa37404243838dc36aa0f53ab, type: 3}
---- !u!114 &5113617154169684360
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1179582423896866597}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64a9aa21592164e3a8e050f02d32bec2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveDistance: 3
-  moveSpeed: 2
