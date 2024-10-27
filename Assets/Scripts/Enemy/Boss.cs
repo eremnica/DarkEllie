@@ -3,59 +3,64 @@ using UnityEngine;
 public class Boss : MonoBehaviour
 {
     public GameObject fallingItem; // Префаб предмета, который будет падать
-    public GameObject Board;
+    public GameObject Board; // Деревяшка для взаимодействия
     public Transform dropPosition; // Позиция, откуда будет падать предмет
     public Enemy targetEnemy; // Ссылка на врага
+    public float interactionRange = 2f; // Расстояние взаимодействия
 
-        void Start()
+    private Transform player; // Ссылка на игрока
+
+    void Start()
+    {
+        player = GameObject.FindWithTag("Player")?.transform;
+
+        if (targetEnemy == null)
         {
-            if (targetEnemy == null)
+            GameObject foundEnemy = GameObject.FindWithTag("Boss");
+            if (foundEnemy != null)
             {
-                GameObject foundEnemy = GameObject.FindWithTag("Boss");
-                if (foundEnemy != null)
+                targetEnemy = foundEnemy.GetComponent<Enemy>();
+                if (targetEnemy == null)
                 {
-                    targetEnemy = foundEnemy.GetComponent<Enemy>();
-                    if (targetEnemy == null)
-                    {
-                        Debug.LogError("Не удалось найти компонент Enemy на объекте с тегом 'Boss'.");
-                    }
+                    Debug.LogError("Не удалось найти компонент Enemy на объекте с тегом 'Boss'.");
                 }
-                else
-                {
-                    Debug.LogError("Не удалось найти объект с тегом 'Boss'.");
-                }
+            }
+            else
+            {
+                Debug.LogError("Не удалось найти объект с тегом 'Boss'.");
             }
         }
+    }
 
-        void Update()
+    void Update()
+    {
+        // Проверяем нажатие клавиши для обрезания веревки и расстояние до деревяшки
+        if (Input.GetKeyDown(KeyCode.E) && Vector2.Distance(player.position, Board.transform.position) <= interactionRange)
         {
-            // Проверяем нажатие клавиши для обрезания веревки
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                CutRope();
-            }
+            CutRope();
+        }
+    }
+
+    public void CutRope()
+    {
+        if (targetEnemy == null)
+        {
+            Debug.LogWarning("TargetEnemy не назначен!");
+            return;
         }
 
-        public void CutRope()
-        {
-            if (targetEnemy == null)
-            {
-                Debug.LogWarning("TargetEnemy не назначен!");
-                return;
-            }
-
-            // Удаляем платформу
-            Destroy(dropPosition.gameObject);
-            Destroy(Board);
+        // Удаляем платформу и деревяшку
+        Destroy(dropPosition.gameObject);
+        Destroy(Board);
 
         // Отвязываем падающий предмет
-        fallingItem.transform.parent = null; // Убираем его из родительской иерархии
+        fallingItem.transform.parent = null;
 
         // Включаем гравитацию, если она была отключена
         Rigidbody2D rb = fallingItem.GetComponent<Rigidbody2D>();
         if (rb != null)
         {
-            rb.isKinematic = false; // Включаем физику, чтобы предмет мог упасть
+            rb.isKinematic = false;
         }
 
         // Добавляем компонент для обработки столкновения
@@ -64,28 +69,24 @@ public class Boss : MonoBehaviour
         {
             fallingItemScript = fallingItem.AddComponent<FallingItem>();
         }
-        fallingItemScript.targetEnemy = targetEnemy; // Передаем ссылку на врага
+        fallingItemScript.targetEnemy = targetEnemy;
     }
 
-
     private class FallingItem : MonoBehaviour
+    {
+        public Enemy targetEnemy;
+
+        private void OnCollisionEnter2D(Collision2D collision)
         {
-            public Enemy targetEnemy; // Ссылка на врага
-
-            private void OnCollisionEnter2D(Collision2D collision)
+            if (collision.gameObject.CompareTag("Boss") && targetEnemy != null)
             {
-                if (collision.gameObject.CompareTag("Boss") && targetEnemy != null)
-                {
-                    // Определяем направление атаки (вниз)
-                 Vector2 attackDirection = Vector2.down;
+                Vector2 attackDirection = Vector2.down;
                 Debug.LogWarning("Предмет упал на врага");
-                // Наносим урон врагу
-                targetEnemy.TakeDamage(4, attackDirection); // Передаем урон и направление
-                //targetEnemy.Die(); // Уничтожаем врага
-                //Destroy(targetEnemy);
-                Destroy(gameObject); // Уничтожаем предмет после столкновения
 
-                }
+                targetEnemy.TakeDamage(4, attackDirection);
+
+                Destroy(gameObject);
             }
         }
     }
+}

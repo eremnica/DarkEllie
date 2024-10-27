@@ -132,7 +132,7 @@ public class CharacterHealth : MonoBehaviour
         background.gameObject.SetActive(false);
         restartButton.gameObject.SetActive(false);
         //Sэ
-      
+
 
     }
 
@@ -150,7 +150,7 @@ public class CharacterHealth : MonoBehaviour
     {
         if (healthBarUI != null)
         {
-            Vector3 healthBarWorldPosition = transform.position + new Vector3(0, 2.3f, 0);
+            Vector3 healthBarWorldPosition = transform.position + new Vector3(0, 1.6f, 0);
             Vector3 screenPosition = Camera.main.WorldToScreenPoint(healthBarWorldPosition);
             healthBarUI.position = screenPosition;
         }
